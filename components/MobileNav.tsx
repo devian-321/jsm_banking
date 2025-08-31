@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { sidebarLinks } from '@/constants'
 import { cn } from '@/lib/utils'
 import { usePathname } from 'next/navigation'
+import Footer from './Footer'
 const MobileNav = ({ user }: MobileNavProps) => {
     const pathname = usePathname()
     return (
@@ -39,12 +40,12 @@ const MobileNav = ({ user }: MobileNavProps) => {
                                                 href={item.route}
                                                 key={item.label}
                                                 className={cn('mobilenav-sheet_close w-full', { 'bg-bank-gradient': isActive })}>
-                                                    <Image
-                                                        src={item.imgURL}
-                                                        alt={item.label}
-                                                        width={20}
-                                                        height={20}
-                                                        className={cn({ 'brightness-[3] invert-0': isActive })} />
+                                                <Image
+                                                    src={item.imgURL}
+                                                    alt={item.label}
+                                                    width={20}
+                                                    height={20}
+                                                    className={cn({ 'brightness-[3] invert-0': isActive })} />
                                                 <p className={cn('text-16 font-semibold text-black-2', { 'text-white': isActive })}>{item.label}</p>
                                             </Link>
                                         </SheetClose>
@@ -52,6 +53,7 @@ const MobileNav = ({ user }: MobileNavProps) => {
                                 })}
                             </nav>
                         </SheetClose>
+                        <Footer user={user} type="mobile"/>
                     </div>
 
                 </SheetContent>
