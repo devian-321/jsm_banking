@@ -3,6 +3,15 @@ import Image from "next/image";
 import MobileNav from "@/components/MobileNav";
 import { getLoggedInUser } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
+import * as Sentry from '@sentry/nextjs';
+import type { Metadata } from "next";
+export function generateMetadata(): Metadata {
+  return {
+    other: {
+      ...Sentry.getTraceData()
+    }
+  }
+}
 
 export default async function RootLayout({
   children,
@@ -33,5 +42,6 @@ export default async function RootLayout({
       </div>
 
     </main>
+
   );
 }
