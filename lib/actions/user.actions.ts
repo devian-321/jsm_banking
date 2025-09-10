@@ -19,11 +19,24 @@ const {
 
 } = process.env
 
-async function getUserInfo() {
-    const { account } = await createSessionClient()
-    const user = await account.get()
-    return user
+
+export const getUserInfo = async ({ userId }: getUserInfoProps) => {
+    try {
+        const { database } = await createAdminClient();
+
+        const user = await database.listRows({
+            databaseId: DATABASE_ID!,
+            tableId: USER_TABLE_ID!,
+            queries: [Query.equal('userId', [userId])]
+
+        })
+
+        return parseStringify(user.rows[0]);
+    } catch (error) {
+        console.log(error)
+    }
 }
+
 
 
 export const signIn = async ({ email, password }: signInProps) => {
@@ -101,21 +114,26 @@ export const signUp = async (userData: SignUpParams) => {
 export async function getLoggedInUser() {
     try {
         const { account } = await createSessionClient();
-        const user = await account.get();
+        const result = await account.get();
+
+        const user = await getUserInfo({ userId: result.$id })
+
         return parseStringify(user);
     } catch (error) {
+        console.log(error)
         return null;
     }
 }
 
-
 export const logoutAccount = async () => {
     try {
         const { account } = await createSessionClient();
-        cookies().delete(process.env.SESSION_NAME!)
-        await account.deleteSession({ sessionId: 'current' })
-    } catch {
-        return null
+
+        cookies().delete('appwrite-session');
+
+        await account.deleteSession('current');
+    } catch (error) {
+        return null;
     }
 }
 
@@ -224,5 +242,38 @@ export const exchangePublicToken = async ({
 
     } catch (error) {
         console.log("Something happened while creating exchanging token: ", error)
+    }
+}
+
+
+export const getBanks = async ({ userId }: getBanksProps) => {
+    try {
+        const { database } = await createAdminClient()
+        const banks = await database.listRows({
+            databaseId: DATABASE_ID!,
+            tableId: BANK_TABLE_ID!,
+            queries: [Query.equal('userId', [userId])]
+
+        })
+        return parseStringify(banks.rows)
+    } catch (error) {
+        console.log("Error from getBanks: ", error)
+
+    }
+}
+
+export const getBank = async ({ documentId }: getBankProps) => {
+    try {
+        const { database } = await createAdminClient()
+        const bank = await database.listRows({
+            databaseId: DATABASE_ID!,
+            tableId: BANK_TABLE_ID!,
+            queries: [Query.equal('$id', [documentId])]
+
+        })
+        return parseStringify(bank.rows[0])
+    } catch (error) {
+        console.log("Error from get specific Bank: ", error)
+
     }
 }

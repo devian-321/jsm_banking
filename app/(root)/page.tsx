@@ -3,9 +3,24 @@ import HeaderBox from '@/components/headerBox'
 import TotalBalanceBox from '@/components/TotalBalanceBox'
 import RightSideBar from '@/components/RightSideBar'
 import { getLoggedInUser } from '@/lib/actions/user.actions'
+import { getAccount, getAccounts } from '@/lib/actions/bank.actions'
+import RecentTransactions from "@/components/RecentTransactions"
 
-const Home = async() => {
+const Home = async ({ searchParams: { id, page } }: SearchParamProps) => {
+  const currentPage = Number(page as string) || 1;
   const loggedUser = await getLoggedInUser();
+  const accounts = await getAccounts({
+    userId: loggedUser.$id,
+
+  })
+  if (!accounts) {
+    return;
+  }
+  const accountsData = accounts?.data;
+  const appwriteItemId = (id as string) || accountsData[0]?.appwriteItemId;
+
+  const account = await getAccount({ appwriteItemId })
+
   return (
     <section className='home'>
       <div className='home-content'>
@@ -13,21 +28,26 @@ const Home = async() => {
           <HeaderBox
             type='greeting'
             title='Welcome'
-            user={loggedUser?.name || 'Guests'}
+            user={loggedUser?.firstName || 'Guests'}
             subtext='Access and manage your account and transactions efficiently.'
           />
           <TotalBalanceBox
-            accounts={[]}
-            totalBanks={1}
-            totalCurrentBalance={1250.25}
+            accounts={accountsData}
+            totalBanks={account?.totalBanks}
+            totalCurrentBalance={accounts?.totalCurrentBalance}
           />
         </header>
-        RECENT TRANSACTIONS
+        <RecentTransactions
+          accounts={accountsData}
+          transactions={account?.transactions}
+          appwriteItemId={appwriteItemId}
+          page={currentPage}
+        />
       </div>
       <RightSideBar
         user={loggedUser}
-        transactions={[]}
-        banks={[{currentBalance:123.5}, {currentBalance:500}]}
+        transactions={accounts?.transactions}
+        banks={accountsData?.slice(0, 2)}
 
       />
     </section>
