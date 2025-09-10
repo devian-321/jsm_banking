@@ -46,6 +46,7 @@ const AuthForm = ({ type }: { type: string }) => {
 
         try {
             console.log(type)
+            console.log("Data from authForm: ", data)
             if (type === 'sign-up') {
                 const userData = {
                     firstName: data.firstName!,

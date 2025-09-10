@@ -82,6 +82,7 @@ export const signUp = async (userData: SignUpParams) => {
             }
 
         })
+        console.log("NEW user from signUp function: ", newUser)
         const session = await account.createEmailPasswordSession({ email, password });
         cookies().set(process.env.SESSION_NAME ?? "session", session.secret, {
             path: "/",
@@ -89,7 +90,7 @@ export const signUp = async (userData: SignUpParams) => {
             sameSite: "strict",
             secure: true,
         });
-        return parseStringify(newUserAccount)
+        return parseStringify(newUser)
 
     } catch (error) {
         console.error('Error', error);
