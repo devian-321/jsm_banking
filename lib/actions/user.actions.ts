@@ -49,7 +49,7 @@ export const signIn = async ({ email, password }: signInProps) => {
             sameSite: "strict",
             secure: true,
         });
-        const user = await getUserInfo()
+        const user = await getUserInfo({ userId: session.userId })
         console.log("userrr", user)
         return user
     } catch (error) {
@@ -224,7 +224,7 @@ export const exchangePublicToken = async ({
         // If the funding source URL is not created, throw an error
         if (!fundingSourceUrl) throw Error;
 
-        // Create a bank account using the user ID, item ID, account ID, access token, funding source URL, and shareableId ID
+        // Create a bank account using the user ID, item ID, account ID, access token, funding source URL, and sharableId ID
         await createBankAccount({
             userId: user.$id,
             bankId: itemId,
@@ -271,6 +271,25 @@ export const getBank = async ({ documentId }: getBankProps) => {
             queries: [Query.equal('$id', [documentId])]
 
         })
+        return parseStringify(bank.rows[0])
+    } catch (error) {
+        console.log("Error from get specific Bank: ", error)
+
+    }
+}
+
+export const getBankByAccountId = async ({ accountId }: getBankByAccountIdProps) => {
+    try {
+        const { database } = await createAdminClient()
+        const bank = await database.listRows({
+            databaseId: DATABASE_ID!,
+            tableId: BANK_TABLE_ID!,
+            queries: [Query.equal('$id', [accountId])]
+
+        })
+        if (bank.total !== 1) {
+            return null;
+        }
         return parseStringify(bank.rows[0])
     } catch (error) {
         console.log("Error from get specific Bank: ", error)

@@ -44,11 +44,12 @@ export const getTransactionsByBankId = async ({ bankId }: getTransactionsByBankI
             }
         )
 
-        const receiverTransactions = await database.listRows(
-            DATABASE_ID!,
-            TRANSACTION_COLLECTION_ID!,
-            [Query.equal('receiverBankId', bankId)],
-        );
+        const receiverTransactions = await database.listRows({
+            databaseId: DATABASE_ID!,
+            tableId: TRANSACTION_COLLECTION_ID!,
+            queries: [Query.equal('receiverBankId', [bankId])]
+
+        })
 
         const transactions = {
             total: senderTransactions.total + receiverTransactions.total,
